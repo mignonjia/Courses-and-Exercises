@@ -1,0 +1,127 @@
+\documentclass[12pt]{article}
+ \usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+ 
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\K}{\mathcal{K}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\C}{\mathcal{C}}
+\newcommand{\Enc}{\text{Enc}}
+\newcommand{\Dec}{\text{Dec}}
+\newcommand{\Gen}{\text{Gen}}
+
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+%If you want to title your bold things something different just make another thing exactly like this but replace "problem" with the name of the thing you want, like theorem or lemma or whatever
+ 
+\begin{document}
+ 
+%\renewcommand{\qedsymbol}{\filledbox}
+%Good resources for looking up how to do stuff:
+%Binary operators: http://www.access2science.com/latex/Binary.html
+%General help: http://en.wikibooks.org/wiki/LaTeX/Mathematics
+%Or just google stuff
+ 
+\title{Chapter 02}
+\author{Mingjia Huo}
+\date{}
+\maketitle
+
+\begin{problem}{2.3} 
+\textbf{Refute}: 
+Assume $\mathcal{M}=\{0,1\}$ with uniform distribution, define (Gen, Enc, Dec):
+\begin{itemize}
+    \item $\Gen$: $\varnothing\rightarrow\K$, where $\mathcal{K}=\{k_1k_2\mid k_1\in\{0,1\}, k_2\in\{0,1,2\}\}, \Pr[K=k_1k_2]=\frac16$.
+    \item $\Enc$: $\K\times\M\rightarrow\C$, where $\mathcal{C}=\{c_1c_2\mid c_1,c_2=0,1\}$. Here, $c_1=k_1\oplus m$, and
+    \begin{equation*}
+        c_2=\begin{cases}
+        0, & k_2=0,1 \\
+        1, & k_2=2
+        \end{cases}
+    \end{equation*}
+    \item $\Dec$: $\K\times\C\rightarrow\M$, where $m=c_1\oplus k_1$.
+\end{itemize}\par
+In this construction, $\Pr[M=m\mid C=c]=\frac 12=\Pr[M=m]$. But $$\Pr[C=00]=\Pr[c_1=0]\times\Pr[c_2=0]=\frac13,$$ $$\Pr[C=01]=\Pr[c_1=0]\times\Pr[c_2=1]=\frac16,$$ a contradiction.
+\end{problem}
+
+
+\begin{problem}{2.11} 
+\textbf{Part 1}:\par
+Assume $\mid\C\mid=\mid\M\mid=n$, $\mid\K\mid=l$, there exists a encryption scheme (Gen,Enc,Dec). Let $\M=\{m_1,\cdots,m_n\},\K=\{k_1,\cdots,k_l\},\C=\{c_1,\cdots,c_n\}$, and\begin{itemize}
+    \item Gen: $\{0,1\}^*\rightarrow\K$
+		\begin{equation*}  
+			\Pr[\Gen=k_j]= \begin{cases}
+					\frac 1n, &  j\in\{1,\cdots,l-1\} \\  
+					\frac {n-l+1}{n}, & j=l  
+				\end{cases} 
+		\end{equation*}
+    \item Enc: $\K\times\M\rightarrow\C$\par
+    For $j\in\{1,\cdots,l-1\}$, $\Enc_{k_j}(m_i)=c_{(i+j\mod n)}$.\par
+    For $j=l$, and $\forall t\in\{l,l+1,\cdots,n\}$, $\Pr[\Enc_{k_l}(m_i)=c_{(i+t \mod n)}]=\frac {1}{n-l+1}$.
+    \item Dec: $\K\times\C\rightarrow\M$ \par
+    For $j\in\{1,\cdots,l-1\}$, $\Dec_{k_j}(c_i)=c_{(i-j\mod n)}$.\par
+    For $j=l$, and $\forall t\in\{l,l+1,\cdots,n\}$, $\Pr[\Dec_{k_l}(m_i)=c_{(i-t \mod n)}]=\frac {1}{n-l+1}$.
+\end{itemize}\par
+
+Then $\forall i,j\in[n],m_i\in\M$,
+\begin{itemize}
+    \item when $j\in\{(i+1)\mod n,\cdots, (i+l-1)\mod n\}:$ \par $$\Pr[\Enc_{K}(m_i)=c_j]=\Pr[\Enc_{k_{(j-i \mod n)}}(m_i)=c_j]=\frac1n;$$
+    \item otherwise, $$\Pr[\Enc_{K}(m_i)=c_j]=\Pr[\Enc_{k_l}(m_i)=c_j]\times\Pr[K=k_l]=\frac{1}{n-l+1}\frac{n-l+1}{n}=\frac 1n,$$
+\end{itemize}
+which means $\forall m,m'\in\M, c\in\C,$
+\[\Pr[\Enc_{K}(m)=c]=\Pr[\Enc_{K}(m')=c]=\frac1n.\]
+So the construction ensures perfect secrecy.\par
+And for message $m_i$, when
+\begin{enumerate}
+    \item $k\in\{k_1,\cdots,k_{l-1}\}$, then $\Dec_k(\Enc_k(m))=m$.
+    \item $k=k_l$, assume $C_m=\{c\mid c\in\C, \Pr[\Enc_{k_l}(m)=c]\ne 0\}$, then
+    \begin{align*}
+        \Pr[\Dec_k(\Enc_k(m))=m]
+        &=\sum_{c\in C_m}\Pr[\Enc_{k_l}(m)=c]\Pr[\Dec_{k_l}(c)=m]\\
+        &=(n-l+1)\times\frac{1}{n-l+1}\times\frac{1}{n-l+1}\\
+        &=\frac {1}{n-l+1}.
+    \end{align*}
+    \end{enumerate}
+    To sum up, \begin{align*}
+        &\Pr[\Dec_K(\Enc_K(m))=m]\\
+        =&\sum_{k=k_1}^{k_{l-1}}\Pr[K=k]\times\Pr[\Dec_k(\Enc_k(m))=m]+\Pr[K=k_l]\times\Pr[\Dec_{k_l}(\Enc_{k_l}(m))=m] \\
+        =&(l-1)\times\frac1n+\frac{n-l+1}{n}\times\frac{1}{n-l+1}\\
+        =&\frac {l}{n}.
+    \end{align*}
+    Let $l=\lceil2^{-t}n\rceil$, so when $n$ is large enough, we have $l<n$, which means $\mid\K\mid<\mid\M\mid$. Then $$\Pr[\Dec_K(\Enc_K(m))=m]=\frac{\lceil2^{-t}n\rceil}{n}\ge2^{-t},$$ which satisfies the condition.
+    \vspace{3ex}
+    
+    \textbf{Part 2:}\par
+    From \textbf{Part 1} we have $\mid\K\mid=l=\lceil2^{-t}n\rceil$. Then we proof $l$ must $\ge \lceil2^{-t}n\rceil$.\par
+    By condition, $\Pr[\Dec_K(\Enc_K(m))=m]\ge 2^{-t}$. So $$\sum_m\Pr[\Dec_K(\Enc_K(m))=m]\ge 2^{-t}n$$.
+    Let $C_{k,m}=\{c\mid \Pr[\Enc_k(m)=c]\ne 0\}$. Then we have \begin{align*}
+        &\sum_m\Pr[\Dec_K(\Enc_K(m))=m]\\
+        =&\sum_m\sum_k\Pr[K=k]\Pr[\Dec_k(\Enc_k(m))=m]\\
+        =&\sum_{m,k}\Pr[K=k]\sum_{c\in C_{k,m}}\Pr[\Enc_k(m)=c]\times\Pr[\Dec_k(c)=m\mid \Enc_k(m)=c]\\
+        =&\sum_{m,k}\sum_{c\in C_{k,m}}\Pr[K=k]\Pr[\Enc_k(m)=c]\Pr[\Dec_k(c)=m\mid \Enc_k(m)=c]
+    \end{align*}\par
+    When $\Pr[\Enc_k(m)=c]\ne0$, $\Pr[\Dec_k(c)=m\mid \Enc_k(m)=c]=\Pr[\Dec_k(c)=m]$. And when $c\not\in C_{k,m}$, we have $\Pr[\Enc_k(m)=c]=0$. Thus,
+    \begin{align*}
+    &2^{-t}n\\
+    \le&\sum_m\Pr[\Dec_K(\Enc_K(m))=m]\\
+    =&\sum_{m,k}\sum_{c\in C_{k,m}}\Pr[K=k]\Pr[\Enc_k(m)=c]\Pr[\Dec_k(c)=m\mid \Enc_k(m)=c]\\
+    =&\sum_{m,k}\sum_{c\in C_{k,m}}\Pr[K=k]\Pr[\Enc_k(m)=c]\Pr[\Dec_k(c)=m]\\
+    =&\sum_{m,k,c}\Pr[K=k]\Pr[\Enc_k(m)=c]\Pr[\Dec_k(c)=m]
+    \end{align*}\par
+    On the other hand, by perfect secrecy, $$\forall m,m'\in\M,\Pr[\Enc_K(m)=c]=\Pr[\Enc_K(m')=c]=\Pr[C=c].$$\par
+    Thus, $$\sum_{c,m}\Pr[C=c]\Pr[\Dec_k(c)=m]=\sum_{c}\Pr[C=c]\times1=1.$$ \par
+    Obviously, $$\forall m,\Pr[C=c]=\sum_{k'\in\K}\Pr[K=k']\Pr[\Enc_{k'}(m)=c].$$\par Then,
+    \begin{align*}
+        l=&\sum_{k\in\K}1\\
+        =&\sum_{k}\sum_{c,m}\Pr[C=c]\Pr[\Dec_k(c)=m]\\
+        =&\sum_{k,c,m}\sum_{k'\in\K}\Pr[K=k']\Pr[\Enc_{k'}(m)=c]\Pr[\Dec_k(c)=m]\\
+        =&\sum_{k=k',c,m}\Pr[K=k']\Pr[\Enc_{k'}(m)=c]\Pr[\Dec_k(c)=m]\\
+        &+\sum_{k,c,m}\sum_{k'\ne k}\Pr[K=k']\Pr[\Enc_{k'}(m)=c]\Pr[\Dec_k(c)=m]\\
+        \ge&\sum_{k=k',c,m}\Pr[K=k']\Pr[\Enc_{k'}(m)=c]\Pr[\Dec_k(c)=m]\\
+        =&\sum_{k,c,m}\Pr[K=k]\Pr[\Enc_{k}(m)=c]\Pr[\Dec_k(c)=m]\\
+        \ge&2^{-t}n.
+    \end{align*}
+    So the lower bound is $\lceil2^{-t}\mid\M\mid\rceil$.
+\end{problem}
+\end{document}

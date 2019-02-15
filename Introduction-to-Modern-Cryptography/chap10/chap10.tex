@@ -1,0 +1,78 @@
+\documentclass[a4paper]{article}
+ \usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{graphicx} 
+\usepackage{algorithm,algorithmicx}
+\usepackage{hyperref}
+\usepackage{algpseudocode}
+\usepackage{epsfig}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+
+\newcommand{\poly}{\text{poly}}
+\newcommand{\negl}{\text{negl}}
+\newcommand{\Enc}{\text{Enc}}
+\newcommand{\GenRSA}{\text{GenRSA}}
+\newcommand{\Dec}{\text{Dec}}
+\newcommand{\Gen}{\text{Gen}}
+\newcommand{\Mac}{\text{Mac}}
+\newcommand{\Vrfy}{\text{Vrfy}}
+\newcommand{\eav}{\text{eav}}
+\newcommand{\tsb}{\text{2sb}}
+\newcommand{\ssb}{\text{sb}}
+\newcommand{\isb}{\text{isb}}
+
+\newcommand{\lsb}{\text{lsb}}
+\newcommand{\half}{\text{half}}
+\newcommand{\KE}{\text{KE}}
+\newcommand{\Query}{\text{Query}}
+\newcommand{\hash}{\text{Hash}}
+\newcommand{\trans}{\text{trans}}
+\newcommand{\Decaps}{\text{Decaps}}
+\newcommand{\Encaps}{\text{Encaps}}
+\newcommand{\Invert}{\text{Invert}}
+\newcommand{\multi}{\text{multi}}
+\newcommand{\KEM}{\text{KEM}}
+\newcommand{\Pubk}{\text{Pubk}}
+\newcommand{\C}{\mathcal{C}}
+\newcommand{\U}{\mathcal{U}}
+\newcommand{\Y}{\mathcal{Y}}
+\newcommand{\K}{\mathcal{K}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\h}{\mathcal{H}}
+\newcommand{\V}{\mathcal{V}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\G}{\mathbb{G}}
+\newcommand{\A}{\mathcal{A}}
+\newcommand{\OO}{\mathcal{O}}
+
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+%If you want to title your bold things something different just make another thing exactly like this but replace "problem" with the name of the thing you want, like theorem or lemma or whatever
+ 
+\begin{document}
+ 
+%\renewcommand{\qedsymbol}{\filledbox}
+%Good resources for looking up how to do stuff:
+%Binary operators: http://www.access2science.com/latex/Binary.html
+%General help: http://en.wikibooks.org/wiki/LaTeX/Mathematics
+%Or just google stuff
+ 
+\title{Chapter 10}
+\author{Mingjia Huo}
+\date{}
+\maketitle
+
+\begin{problem}{10.4}
+Show a concrete attack:\par
+For adversary $\A$, he is given $\trans=(s,u,w)$, then he can compute $t=u\oplus s$. In key-exchange experiment, if $\hat k=w\oplus u\oplus s$, then $\A$ outputs $b'=0$; otherwise, $\A$ outputs $b'=1$.\par
+So if $b=0$, then $\A$ always has $b'=b$; and if $b=1$, $\A$ guesses right with probability $1-2^{-n}$.
+\begin{align*}
+    \Pr[\KE_{\A,\Pi}^{\eav}(n)=1]&=\frac12\Pr[\KE_{\A,\Pi}^{\eav}(n)=1\mid b=0]+\frac12\Pr[\KE_{\A,\Pi}^{\eav}(n)=1\mid b=1]\\
+    &=\frac12+\frac12(1-2^{-n})\\
+    &=1-\negl(n),
+\end{align*}which is significantly larger than $\frac12$.
+\end{problem}
+\end{document}
+

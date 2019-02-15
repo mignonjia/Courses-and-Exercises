@@ -1,0 +1,221 @@
+\documentclass[a4paper]{article}
+ \usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{graphicx} 
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+
+\newcommand{\poly}{\text{poly}}
+\newcommand{\negl}{\text{negl}}
+\newcommand{\Enc}{\text{Enc}}
+\newcommand{\GenRSA}{\text{GenRSA}}
+\newcommand{\Dec}{\text{Dec}}
+\newcommand{\Gen}{\text{Gen}}
+\newcommand{\Mac}{\text{Mac}}
+\newcommand{\Vrfy}{\text{Vrfy}}
+\newcommand{\eav}{\text{eav}}
+\newcommand{\tsb}{\text{2sb}}
+\newcommand{\ssb}{\text{sb}}
+\newcommand{\isb}{\text{isb}}
+\newcommand{\lsb}{\text{lsb}}
+\newcommand{\half}{\text{half}}
+\newcommand{\KE}{\text{KE}}
+\newcommand{\otime}{\text{1-time}}
+\newcommand{\Query}{\text{Query}}
+\newcommand{\hash}{\text{Hash}}
+\newcommand{\Trans}{\text{Trans}}
+\newcommand{\Decaps}{\text{Decaps}}
+\newcommand{\Encaps}{\text{Encaps}}
+\newcommand{\Invert}{\text{Invert}}
+\newcommand{\multi}{\text{multi}}
+\newcommand{\KEM}{\text{KEM}}
+\newcommand{\Pubk}{\text{Pubk}}
+\newcommand{\C}{\mathcal{C}}
+\newcommand{\U}{\mathcal{U}}
+\newcommand{\Y}{\mathcal{Y}}
+\newcommand{\K}{\mathcal{K}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\h}{\mathcal{H}}
+\newcommand{\V}{\mathcal{V}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\G}{\mathbb{G}}
+\newcommand{\I}{\mathcal{I}}
+\newcommand{\A}{\mathcal{A}}
+\newcommand{\OO}{\mathcal{O}}
+
+
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+%If you want to title your bold things something different just make another thing exactly like this but replace "problem" with the name of the thing you want, like theorem or lemma or whatever
+ 
+\begin{document}
+ 
+%\renewcommand{\qedsymbol}{\filledbox}
+%Good resources for looking up how to do stuff:
+%Binary operators: http://www.access2science.com/latex/Binary.html
+%General help: http://en.wikibooks.org/wiki/LaTeX/Mathematics
+%Or just google stuff
+ 
+\title{Chapter 12}
+\author{Mingjia Huo}
+\date{}
+\maketitle
+
+\begin{problem}{12.2}
+Assume the one-time secure signature is $\Pi$=(Gen,Sign,Vrfy). And denote the randomness used by $\Gen(1^n)$ is $r\in\{0,1\}^{l(n)}$. That is $$\Gen(1^n,r)=(pk,sk).$$\par
+Construct one-way function $f(r)=pk$, where $pk$ is the first output by $\Gen(1^n,r)$. Based on $\I$ to invert $f$, construct $\A$ of experiment to attack one-way-secure signature.\par
+\begin{enumerate}
+    \item $\A$ is given $1^n,pk$. Then $\A$ outputs $0$ and get its signature $\sigma_0$.
+    \item Run $\I(pk)$, and $\I$ returns $r$.
+    \item Compute $\Gen(1^n,r)=(pk',sk')$.
+    \item Output $(1,\text{Sign}_{sk'}(1))$.
+\end{enumerate}
+Here, if $\I$ can successfully invert $pk$ to $r$, then $\Gen(1^n,r)=(pk,sk')$. And for all possible inverts $r,r'$ of $pk$, the value of private key may be different values $sk,sk'$. But to sign a message $1$, both of $\text{Sign}_{sk}(1)$ and $\text{Sign}_{sk'}(1)$ can be verified by $pk$. So the if $\I$ can successfully invert $pk$ to $r$, then the signature of $1$ is a valid signature. So $$\Pr[\Invert_{\I,f}(n)=1]=\Pr[\text{Sig-forge}_{\A,\Pi}^{\otime}(n)=1].$$
+Since the signature scheme is one-time-secure, we have $f$ is one-way.
+\end{problem}
+
+\begin{problem}{12.4}
+\begin{proof}
+Given adversary $\A'$ of RSA signature, construct $\A$ of RSA problem:\par
+\begin{itemize}
+    \item $\A$ is given $(N,e,y)$, when $y$ is uniform in $\Z_N^*$.
+    \item Run $\A'(N,e,y)$, and get $x$.
+    \item Output $x$.
+\end{itemize}\par
+If $y^d\equiv x\mod N$, then $x^e\equiv y\mod N$.\par
+So $\Pr[\text{RSA-inv}_{\A,\GenRSA}(n)=1]=\Pr[x^e=y]=\Pr[y^d=x]$. So $x$ is a valid signature of $y$. Since $y$ is uniform in $\Z_N^*$, we have
+$$\Pr[\A'succeeds]=\Pr[\text{RSA-inv}_{\A,\GenRSA}(n)=1]\le \negl(n).$$\par
+That is plain RSA signature scheme satisfies the weak definition of security.
+\end{proof}
+\end{problem}
+
+\begin{problem}{12.6}
+\begin{proof}
+Construct adversary $\A$ of the identification scheme $\Pi$ with $\A'$ of the signature scheme $\Pi'$.\par
+\textbf{Algorithm} $\A$:\par
+The algorithm is given $pk$ and access to an oracle $\Trans_{sk}$.
+\begin{enumerate}
+    \item Choose uniform $j\in\{1,\cdots,q\}$.
+    \item Run $\A'(pk)$. Answer its queries as follows:
+    \begin{itemize}
+        \item When $\A'$ makes its $i$th query $H(I_i,m_i)$, answer it as follows:
+        \begin{itemize}
+            \item If $i = j$, output $I_j$ and get $r_0$. Return $r_0$ to $\A'$.
+            \item If $i \ne j$, choose a uniform $r\in\Omega_{pk}$ and return $r$ to $\A'$.
+        \end{itemize}
+        \item When $\A'$ requests a signature on $m$, answer it as follows: \par
+        \begin{itemize}
+            \item Query $\Trans_{sk}$ to obtain $(I,r,s)$.
+            \item Return the signature $(I,s)$.
+        \end{itemize}
+    \end{itemize}   
+    \item If $\A'$ outputs a forged signature $(I,s)$ on a message $m$, check whether $(I,m)=(I_j,m_j)$ and $I=\V(pk,r_0,s)$. If so, then output $s$. Otherwise, abort. 
+\end{enumerate}\par
+Since $H$ is a random oracle, the distribution of $H(I,m)$ is also uniform in $\Omega_{pk}$. When $i\ne j$, $\A$ can simulate $\A'$'s view on function $H$. That is also true when $i=j$, because in the identification experiment, $r$ is also uniform chosen. All the signing queries that $\A'$ makes are answered with valid signatures having the correct distribution.\par
+The only problem is when $\A'$ ask $H(I,m)$ and there is a signature which return the same $I$. Since the signature is output by $\Trans_{sk}$, so the probability of each $I$ is negligible. There are totally polynomial queries, so this issue happens with negligible probability.\par
+$\A$ succeeds if and only if $\A'$ selected $j$ and succeeds, except some negligible probability. Thus,
+$$\Pr[\text{Ident}_{\A,\Pi}(n)=1]\ge\frac{1}{q(n)}\cdot(\Pr[\text{Sig-forge}_{\A',\Pi'}(n)=1]-\negl(n)).$$\par
+Assume the identification scheme is secure, we have $\Pr[\text{Sig-forge}_{\A',\Pi'}(n)=1]\le \negl(n).$
+\end{proof}
+\end{problem}
+
+\begin{problem}{12.8} $ $\par
+\textbf{(a).}\par
+If $0<j<i,j\in\Z$ and the signature of $i$ is $s$, then the signature of $j$ is $f^{(i-j)}(s)$.\par\vspace{1ex}
+\textbf{(b).} Here we assume both $i,j$ can be chosen by the adversary.\par
+\begin{proof}
+Construct algorithm $\A$ to invert the one-way permutation with $\A'$ of the signature scheme, which can output $j$ given $i$ and its signature.\par
+\begin{enumerate}
+    \item $\A$ is given $(f,y)$. Guess a uniform value $i'\in[n]$. Compute $pk=f^{(i)}(y)$.
+    \item Run $\A'$, and get $i$. If $i\ne i'$, abort.
+    \item Give $(f,i,y)$ and $pk$ to $\A'$, and then $\A'$ outputs $(j,y_j)$.
+    \item Compute $x=f^{(j-i-1)}(y_j)$. And output $x$.
+\end{enumerate}\par
+The probability of $i=i'$ is $\frac1n$. Assume $f^{(n-i)}(x')=y$. If $y_j=f^{(n-j)}(x')$, we have $f^{(j-i)}(y_j)=f^{(j-i)}(f^{(n-j)}(x'))=f^{(n-i)}(x')=y$. So $f(x)=f(f^{(j-i-1)}(y_j))=f^{(j-i)}(y_j)=y$. We have
+$$\frac1n\Pr[\text{Sig-forge}_{\A',\Pi'}^{\otime}(n)=1]=\Pr[\Invert_{\A,f}(n)=1]\le\negl(n).$$\par
+So $$\Pr[\text{Sig-forge}_{\A',\Pi'}^{\otime}(n)=1]\le \negl(n).$$
+\end{proof}\vspace{1ex}
+\textbf{(c).} 
+Construct a one-time-secure signature scheme $\Pi'=$(Gen,Sign,Vrfy).
+\begin{enumerate}
+    \item Gen: choose uniform $x,x'\in\{0,1\}^n$ and set $y=f^{(n)}(x),y'=f^{(n)}(x')$.
+    \item Sign: For message $i\in\{1,\cdots,n\}$, output $(f^{(n-i)}(x),f^{(i)}(x'))$.
+    \item Vrfy: To verify $i$ with respect to public key $(y,y')$, check whether $(y,y')=(f^{(i)}(x),f^{(n-i)}(x'))$
+\end{enumerate}\par
+Next we prove it's secure.\par
+\begin{proof}
+Construct an adversary $\A$ for question $(b)$ based on $\A'$ of $\Pi'$ described above.\par 
+\begin{enumerate}
+    \item Guess a uniform value $i'\in[n]$. Compute $pk=f^{(i)}(y)$.
+    \item Run $\A'(pk)$, and get $i$. If $i\ne i'$, abort.
+    \item Unformly choose $b\in\{0,1\},\sigma'\in\{0,1\}^n$.
+    If $b=0$, query $i$ and get $\sigma$; otherwise, query $n-i$ and get $\sigma$.
+    \item If $b=0$, give $(\sigma,\sigma')$ to $\A'$; otherwise, give $(\sigma',\sigma)$ to $\A'$.
+    \item When $\A'$ returns $j'$ and $(\sigma_0,\sigma_1)$, if $b=0$, then $j=j'$ and output $(j,\sigma_0)$; otherwise, then $j=n-j'$ and output $(j,\sigma_1)$.
+\end{enumerate}\par
+Firstly, the probability of $i=i'$ is $\frac1n$.\par
+From $\A'$ point of view, the distribution of $\sigma$ and $\sigma'$ is the same. So
+$$\Pr[\text{Sig-forge}_{\A',\Pi'}^{\otime}(n)=1\land (j<i)\mid b=0]=\Pr[\text{Sig-forge}_{\A',\Pi'}^{\otime}(n)=1\land (n-j<n-i)\mid b=1],$$ which means where $\sigma$ is put won't affect the probability of success when $j'<i'$.\par
+For the same reason,
+\begin{align*}
+    &\Pr[\text{Sig-forge}_{\A',\Pi'}^{\otime}(n)=1\mid b=0]\\
+    =&\Pr[\text{Sig-forge}_{\A',\Pi'}^{\otime}(n)=1\mid b=1]\\
+    =&\Pr[\text{Sig-forge}_{\A',\Pi'}^{\otime}(n)=1]
+\end{align*}\par
+So,
+\begin{align*}
+    &\Pr[\text{Sig-forge}_{\A,\Pi}^{\otime}(n)=1]\\
+    =&\Pr[\text{Sig-forge}_{\A,\Pi}^{\otime}(n)=1\mid b=0]\cdot\Pr[b=0]+\Pr[\text{Sig-forge}_{\A,\Pi}^{\otime}(n)=1\mid b=1]\cdot\Pr[b=1]\\
+    =&\frac{1}{2}(\frac1n\Pr[\text{Sig-forge}_{\A',\Pi'}^{\otime}(n)=1\land (j>i)\mid b=0]+\frac1n\Pr[\text{Sig-forge}_{\A',\Pi'}^{\otime}(n)=1\land (n-j<n-i)\mid b=1])\\
+    =&\frac{1}{2n}(\Pr[\text{Sig-forge}_{\A',\Pi'}^{\otime}(n)=1\land (j>i)\mid b=0]+\Pr[\text{Sig-forge}_{\A',\Pi'}^{\otime}(n)=1\land (j<i)\mid b=0])\\
+    =&\frac{1}{2n}\Pr[\text{Sig-forge}_{\A',\Pi'}^{\otime}(n)=1\mid b=0]\\
+    =&\frac{1}{2n}\Pr[\text{Sig-forge}_{\A',\Pi'}^{\otime}(n)=1].
+\end{align*}\par
+Thus $$\Pr[\text{Sig-forge}_{\A',\Pi'}^{\otime}(n)=1]=2n\Pr[\text{Sig-forge}_{\A,\Pi}^{\otime}(n)=1]\le\negl(n).$$
+\end{proof}
+\end{problem}
+
+\begin{problem}{12.11}
+$l'$ should satisfiy that $\binom{2l}{l}\ge 2^{l'}$, that is $l'\le\log_2(\binom{2l}{l})$.\par
+If $\binom{2l}{l}<2^{l'}$, assume both $m,m'$ is mapped to set $S$. Then the adversary just query $m$ and get $y$. And $(m',y)$ is also valid.\par
+Then we prove when $\binom{2l}{l}\ge 2^{l'}$, the scheme is one-time secure.\par
+\begin{proof}
+Construct algorithm $\A$ to invert $f$ based on $\A'$ to attack the scheme. It is given $1^n$ and $y$ as input.\par
+\begin{enumerate}
+    \item Choose uniform $i^*\in\{1,\cdots,2l\}$, let $y_{i^*}=y$.
+    \item $\forall i\in\{1,\cdots,2l\},i\ne i^*$: 
+    \begin{itemize}
+        \item Choose uniform $x_i\in\{0,1\}^n$ and get $y_i=f(x_i)$.
+    \end{itemize}
+    \item Run $\A'$ on input $y_i,i\in\{1,\cdots,2l\}$.
+    \item When $\A'$ requests a signature on the message $m'$, get set $S_{m'}=\{v_1,\cdots,v_l\}$:
+    \begin{itemize}
+        \item If $i^*\in S_{m'}$, abort.
+        \item Otherwise, return $\sigma'=(x_{v_1},\cdots,x_{v_l})$.
+    \end{itemize}
+    \item When $\A'$ outputs $(m,\sigma)$ with $\sigma=(x_{u_1},\cdots,x_{u_l})$, if $\A$ outputs a forgery at $i^*$, the output $x_{i^*}$.
+\end{enumerate}\par
+The view of $\A'$ is the same with the experiment of one-time signature, since both $y$ and $y_i,i\ne i^*$ are the hash value of uniform $x$. If $\A'$ successfully forges a signature of $x_{i^*}$, then $\A$ successfully invert $y$. \par
+Thus, 
+\begin{align*}
+    &\Pr[\Invert_{\A,f}(n)=1]\\
+    &=\Pr[i^*\not\in S_{m'}, i^*\in S_{m},f(x_{i^*})=y]\\
+    &\ge\Pr[\text{Sig-forge}_{\A',\Pi'}^{\otime}(n)=1\mid i^*\not\in S_{m'}, i^*\in S_{m}]\times\Pr[i^*\in S_{m}\mid i^*\not\in S_{m'}]\times \Pr[i^*\not\in S_{m'}] \\
+    &=\frac{1}{2l}\Pr[\text{Sig-forge}_{\A',\Pi'}^{\otime}(n)=1]
+\end{align*}
+Since $f$ is one-way, we have $$\Pr[\text{Sig-forge}_{\A',\Pi'}^{\otime}(n)=1]\le\negl(n).$$
+\end{proof}
+\end{problem}
+
+\begin{problem}{12.14}
+If $sk_B$ is stolen by adversary $\A$, the adversary can use $sk_B$ to sign on the messages and pretend he is Bob. \par
+If the CA receives a message asking for revocation of Bob: \begin{itemize}
+    \item if the message is sent by Bob, then the CA should execute Bob's order.
+    \item if the message is sent by others, then he can truly get Bob's signature. For security, the CA should revoke the certificate.
+\end{itemize}
+So it is not necessary for the CA to check Bob’s identity in this case.
+\end{problem}
+
+\end{document}
+

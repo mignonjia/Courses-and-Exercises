@@ -1,0 +1,164 @@
+\documentclass[12pt]{article}
+ \usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+ 
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\K}{\mathcal{K}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\C}{\mathcal{C}}
+\newcommand{\Enc}{\text{Enc}}
+\newcommand{\Dec}{\text{Dec}}
+\newcommand{\Gen}{\text{Gen}}
+
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+%If you want to title your bold things something different just make another thing exactly like this but replace "problem" with the name of the thing you want, like theorem or lemma or whatever
+ 
+\begin{document}
+ 
+%\renewcommand{\qedsymbol}{\filledbox}
+%Good resources for looking up how to do stuff:
+%Binary operators: http://www.access2science.com/latex/Binary.html
+%General help: http://en.wikibooks.org/wiki/LaTeX/Mathematics
+%Or just google stuff
+ 
+\title{Chapter 1 and Problems in hw1}
+\author{Mingjia Huo}
+\date{}
+\maketitle
+
+\begin{problem}{1.Part A}
+\begin{proof}
+Define $A=\{s\in S\mid \Pr[X=s]\ge \Pr[Y=s]\}$, so $A\subseteq S$.
+
+First, we have
+$$1=\sum_{s\in S}\Pr[X=s]=\sum_{s\in S}\Pr[Y=s],$$
+$$\Rightarrow \sum_{s\in A}\Pr[X=s]+\sum_{s\in S\backslash A}\Pr[X=s] =\sum_{s\in A}\Pr[Y=s]+\sum_{s\in S\backslash A}\Pr[Y=s], $$
+$$\Rightarrow\sum_{s\in A}(\Pr[X=s]-\Pr[Y=s]) = \sum_{s\in S\backslash A}(\Pr[Y=s]-\Pr[X=s]). $$
+
+So 
+\begin{align*}
+&\frac 12\sum_{s\in S}\mid \Pr[X=s]-\Pr[Y=s]\mid\\
+=&\frac12\left(\sum_{s\in A}(\Pr[X=s]-\Pr[Y=s])+\sum_{s\in S\backslash A}(\Pr[Y=s]-\Pr[X=s]) \right)\\
+=&\sum_{s\in A}(\Pr[X=s]-\Pr[Y=s])
+\end{align*}
+
+And $$\max\limits_{T\subseteq S}(\Pr[X\in T]-\Pr[Y\in T])=\sum\limits_{s\in A}(\Pr[X=s]-\Pr[Y=s]),$$ so 
+$$\Delta(X,Y)=\frac 12\sum_{s\in S}\mid \Pr[X=s]-\Pr[Y=s]\mid=\max\limits_{T\subseteq S}(\Pr[X\in T]-\Pr[Y\in T]).$$
+\end{proof}
+\end{problem}
+
+\begin{problem}{1.Part B}
+\begin{proof}
+Define $B=\{s\in S\mid D(s)=1\}$, so $B\subseteq S$.
+
+So we have
+\begin{align*}
+\Pr[D(X)=1]-\Pr[D(Y)=1]&=\sum_{s\in B}\Pr[X=s]-\sum_{s\in B}\Pr[Y=s] \\
+&=\Pr[X\in B]-\Pr[Y\in B]\\
+&\le \max\limits_{T\subseteq S}(\Pr[X\in T]-\Pr[Y\in T])\\
+&=\Delta(X,Y)
+\end{align*}
+\end{proof}
+\end{problem}
+
+\begin{problem}{1.Part C}
+\begin{proof}
+By the definition of D and X, we have
+$$\Pr[D(X)=1]=\sum\limits_{s\in S}\Pr[X=s]p_s. $$
+So
+\begin{eqnarray}
+\Pr[D(X)=1]-\Pr[D(Y)=1]=\sum\limits_{s\in S}(\Pr[X=s]-\Pr[Y=s])p_s 
+\end{eqnarray}
+First, we prove that the optimal $D$ satisfies $p_s\in \{0,1\}$ for every $s\in S$. If not, there is some $s_0\in S$, such that $p_{s_0}=q\in (0,1)$ for $D$. 
+\begin{enumerate}
+\item If $\Pr[X=s_0]\ge \Pr[Y=s_0]$, adjust $p_{s_0}$ to 1. Then by equation (1), the value is non-decreasing.
+\item If $\Pr[X=s_0]<\Pr[Y=s_0]$, adjust $p_{s_0}$ to 0. Then by equation (1), the value is non-decreasing.
+\end{enumerate}
+So the optimal $D$ satisfies $p_s\in \{0,1\}$ for every $s\in S$. 
+
+With the proof of Part B, when $D$ is deterministic, we have
+$$ \Pr[D(X)=1]-\Pr[D(Y)=1]=\Pr[X\in B]-\Pr[Y\in B] $$
+Assume $\arg\max\limits_{T\subseteq S}(\Pr[X\in T]-\Pr[Y\in T])=T_{max}$. Then define
+\begin{equation*}  
+			D_{max}(s)= \begin{cases}
+					1, & s\in T_{max} \\  
+					0, & s\not\in T_{max}  
+				\end{cases} 
+		\end{equation*}
+Thus, 
+\begin{align*}
+\Pr[D_{max}(X)=1]-\Pr[D_{max}(Y)=1]&=\Pr[X\in T_{max}]-\Pr[Y\in T_{max}]\\
+&=\max\limits_{T\subseteq S}(\Pr[X\in T]-\Pr[Y\in T])\\
+&=\Delta(X,Y)   
+\end{align*}
+On the other hand, we have
+$$\Pr[D(X)=1]-\Pr[D(Y)=1]\le \Delta(X,Y).$$
+So
+$$\max_{D}(\Pr[D(X)=1]-\Pr[D(Y)=1])=\Delta(X,Y)$$
+
+
+\end{proof}
+\end{problem}
+
+\begin{problem}{2} 
+    Given $c\in \mathcal{C}$, we can get at most $\mid\mathcal{K}\mid$ plaintexts. That is, there are at least $(\mid\mathcal{M}\mid-\mid\mathcal{K}\mid)$ plaintexts $m\in\mathcal{M}$, s.t.$$ \Pr[\Enc_K(m)=c]=0 .$$ Define $\mathcal{M}_c=\{m\mid \Pr[\Enc_K(m)=c]=0\}$. 
+    
+    On the other hand, 
+    \begin{align*}
+        \Delta(\Enc_K(m_0),\Enc_K(m_1))
+        &=\max\limits_{C\in\mathcal{C}}(\Pr[\Enc_K(m_0)\in C]-\Pr[\Enc_K(m_1)\in C])\\
+        &=\sum_{c\in\mathcal{C}}\max\{\Pr[\Enc_K(m_0)=c]-\Pr[\Enc_K(m_1)=c],0\}
+    \end{align*}\par
+    Fix $m_0$, compute:
+    \begin{align*}
+        \sum_{m_1\in \mathcal{M}}\Delta(\Enc_K(m_0),\Enc_K(m_1))
+        &=\sum_{m_1\in \mathcal{M}}\sum_{c\in\mathcal{C}}\max\{\Pr[\Enc_K(m_0)=c]-\Pr[\Enc_K(m_1)=c],0\}\\
+        &=\sum_{c\in\mathcal{C}}\sum_{m_1\in \mathcal{M}}\max\{\Pr[\Enc_K(m_0)=c]-\Pr[\Enc_K(m_1)=c],0\}\\
+        &\ge \sum_{c\in\mathcal{C}}\sum_{m_1\in \mathcal{M}_c}\max\{\Pr[\Enc_K(m_0)=c]-\Pr[\Enc_K(m_1)=c],0\}\\
+        &=\sum_{c\in\mathcal{C}}\sum_{m_1\in \mathcal{M}_c}\Pr[\Enc_K(m_0)=c]\\
+        &\ge \sum_{c\in\mathcal{C}}(\mid\mathcal{M}\mid-\mid\mathcal{K}\mid)\Pr[\Enc_K(m_0)=c]\\
+        &=\mid\mathcal{M}\mid-\mid\mathcal{K}\mid.
+    \end{align*}
+    The last inequality is because that there are at least $(\mid\mathcal{M}\mid-\mid\mathcal{K}\mid)$ items in $\mathcal{M}_c$. Then with Pigeonhole principle, there exists $m_1^*$, such that $$\Delta(\Enc_K(m_0),\Enc_K(m_1^*))\ge \frac{\mid\mathcal{M}\mid-\mid\mathcal{K}\mid}{\mid\mathcal{M}\mid}=1-\frac{\mid\mathcal{K}\mid}{\mid\mathcal{M}\mid}.$$
+\end{problem}
+
+
+\begin{problem}{3} 
+\textbf{First Part.}
+A \textit{secret-sharing scheme} is a 5-tuple $(\mathcal{M},\mathcal{L},\mathcal{R},\Enc,,\Dec)$ where
+$\mathcal{M},\mathcal{L}$ and $\mathcal{R}$ are finite sets and where
+\begin{itemize}
+    \item $\Enc$: $\mathcal{M}\rightarrow \mathcal{L}\times \mathcal{R}$ is a randomized algorithm;
+    \item Dec: $\mathcal{L}\times \mathcal{R}\rightarrow\mathcal{M}$ is a deterministic algorithm.
+\end{itemize}
+Moreover, we require that $\Dec(\Enc(m))=m$ for every $m\in\mathcal{M}$.
+
+\textbf{Second Part.} 
+Let $\Pi=(\mathcal{M},\mathcal{L},\mathcal{R},\Enc,\Dec)$ be a secret-sharing scheme. Let $\mathcal{L}$ be the distribution over $L$ induced by the first output of Enc, write down as $\Enc.L$. So $\Enc.L$ is a random variable of range $\mathcal{L}$. Similarly, $\Enc.R$ is a random variable of range $\mathcal{R}$.
+
+We say that $\Pi$ is \textit{perfectly secure} if for every two messages $m_0, m_1\in\mathcal{M}$, 
+\[\Delta(\Enc(m_0).L, \Enc(m_1).L)=0,\ \ \ \ \Delta(\Enc(m_0).R, \Enc(m_1).R)=0.\]
+\end{problem}
+
+
+\begin{problem}{1.3} 
+Assume the plaintext is in English. That is, the letter is from $a$ to $z$. First, we define two functions:
+\begin{itemize}
+    \item $to\_number$: $\{a,b,\cdots,z\}\rightarrow\{0,1,\cdots,25\}$
+    \item $to\_letter$: $\{0,1,\cdots,25\}\rightarrow\{A,B,\cdots,Z\}$
+\end{itemize}
+Let $\Pi=(\mathcal{K},\mathcal{M},\mathcal{C},\Gen, \Enc,\Dec)$ be a Vigenere cipher encryption, where
+$\mathcal{K},\mathcal{M}$ and $\mathcal{C}$ are finite sets which represent key, plaintext and ciphertext space respectively. And
+\begin{itemize}
+    \item Gen: $\{0,1\}^*\rightarrow\K$ is a randomized algorithm which generate a key $k$ with its length equal to the input string.
+    \item Enc: $\K\times\M\rightarrow\C$ is a deterministic  encryption  algorithm. Assume the length of $k$ is $l$. Assume $m=m_1m_2\cdots m_n(m_i\in\{a,b,\cdots,z\}),k=k_1k_2\cdots k_l(k_i\in\{a,b,\cdots,z\})$, then define ciphertext $c=c_1c_2\cdots c_n(c_i\in\{A,B,\cdots,Z\})$ as followed:
+    $$\forall i\in\{1,2,\cdots,n\}, c_i=to\_letter( (to\_number(m_i)+to\_number(k_{i'}))\mod 26) , $$
+    where $i'\equiv i\mod l$.
+    \item Dec: $\K\times\C\rightarrow\M$ is a deterministic  decryption  algorithm. To get plaintext $m$, do:
+    $$ \forall i\in\{1,2,\cdots,n\}, m_i=to\_number^{-1}( (to\_letter^{-1}(c_i)-to\_number(k_{i'}))\mod 26) , $$
+    where $i'\equiv i\mod l$.
+\end{itemize}
+\end{problem}
+\end{document}

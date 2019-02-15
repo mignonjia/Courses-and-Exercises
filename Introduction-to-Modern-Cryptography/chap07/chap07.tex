@@ -1,0 +1,278 @@
+\documentclass[a4paper]{article}
+ \usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{graphicx} 
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+
+\newcommand{\poly}{\text{poly}}
+\newcommand{\negl}{\text{negl}}
+\newcommand{\Enc}{\text{Enc}}
+\newcommand{\Dec}{\text{Dec}}
+\newcommand{\Gen}{\text{Gen}}
+\newcommand{\Mac}{\text{Mac}}
+\newcommand{\Vrfy}{\text{Vrfy}}
+\newcommand{\Func}{\text{Func}}
+\newcommand{\Perm}{\text{Perm}}
+\newcommand{\Getvrfy}{\text{Get-Vrfy}}
+\newcommand{\hash}{\text{Hash}}
+\newcommand{\hashsec}{\text{Hash-sec}}
+\newcommand{\Feistel}{\text{Feistel}}
+\newcommand{\Ext}{\text{Ext}}
+\newcommand{\Invert}{\text{Invert}}
+\newcommand{\hc}{\text{hc}}
+\newcommand{\myn}{l_{in}(n)}
+\newcommand{\C}{\mathcal{C}}
+\newcommand{\U}{\mathcal{U}}
+\newcommand{\Y}{\mathcal{Y}}
+\newcommand{\K}{\mathcal{K}}
+\newcommand{\F}{\mathcal{F}}
+\newcommand{\h}{\mathcal{H}}
+\newcommand{\V}{\mathcal{V}}
+\newcommand{\A}{\mathcal{A}}
+\newcommand{\OO}{\mathcal{O}}
+
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+%If you want to title your bold things something different just make another thing exactly like this but replace "problem" with the name of the thing you want, like theorem or lemma or whatever
+ 
+\begin{document}
+ 
+%\renewcommand{\qedsymbol}{\filledbox}
+%Good resources for looking up how to do stuff:
+%Binary operators: http://www.access2science.com/latex/Binary.html
+%General help: http://en.wikibooks.org/wiki/LaTeX/Mathematics
+%Or just google stuff
+ 
+\title{Chapter 07}
+\author{Mingjia Huo}
+\date{}
+\maketitle
+
+\begin{problem}{7.2}
+Proof by contradiction: if $g=(f(x_1),x_2)$ is not a one-way function, there is an $\texttt{PPT}$ $\A$, such that:
+\[\Pr[\Invert_{\A,g}(n)=1]>\negl(n)].\]
+Construct $\A'$ based on $\A$:
+\begin{enumerate}
+    \item When $\A'$ is given $y(=f(x_1))$, he uniformly chooses a $x_2\in\{0,1\}^n$, and give $(y,x_2)$ to $\A$.
+    \item When $\A$ return $(x_1',x_2')$, then $\A'$ output $x_1'$.
+\end{enumerate}
+The input of $\A$ and $\A'$ are both $\poly(|x_1|)$, so $\A$ is $\texttt{PPT}$. If $\A$ can invert $g$ correctly, then $x_1'\in f^{-1}(f(x_1))$, thus $\A'$ can invert $f$ correctly. So:
+\[\Pr[\Invert_{\A',f}(n)=1]\ge\Pr[\Invert_{\A,g}(n)=1]>\negl(n),\]
+a contradiction.\par
+Thus, $g$ is a one-way function.
+\end{problem}
+
+\begin{problem}{7.3}
+Let $f$ be a one-way function and let $p(\cdot)$ be a polynomial such
+that $|f(x)|<p(|x|)$. (If $p$ doesn't exist, then there is no algorithm which can compute $f(x)$ in $\poly(|x|)$.) Without loss of generality, $p$ is increasing with $n$.\par
+Let function $q(n)$ denotes the largest value $len$ such that $p(len)\le n$. So we have $p(q(n)+1)>n$, and $n=\poly(q(n)+1)=\poly(q(n))$.\par 
+Then given $x\in\{0,1\}^n$, $x_q$ denotes the first $q(n)$ bits of $x$. (That is: if $x=x_1\cdots x_n$, then $x_q=x_1\cdots x_{q(n)}$.)\par
+Finally, define $f':\{0,1\}^*\rightarrow\{0,1\}^*$ as followed: 
+\[f'(x)=f(x_q)\|10^{|x|-|f(x_q)|-1}.\]
+\begin{itemize}
+    \item $f'$ is length-preserving:
+    \begin{align*}
+        &|f(x_q)\|10^{|x|-|f(x_q)|-1}|\\
+        =&|f(x_q)|+1+|x|-|f(x_q)|-1\\
+        =&|x|.
+    \end{align*}
+    And $|f(x_q)|<p(|x_q|)\le |x|$, thus $|x|-|f(x_q)|-1\ge0$.\par
+    So it's length-preserving.
+    \item $f'$ is one-way:\par
+    If $f'$ is not one-way, assume there is an \texttt{PPT} $\A',n'$, such that \[\Pr[\Invert_{\A',f'}(n')=1]>\negl(n')].\]
+    Assume $q(n')=n$, construct $\A$ of $f$ based on $\A'$ when $\A'$ is given $1^n$:
+  \begin{enumerate}
+      \item Given $y,1^n$, $\A$ constructs $y\|10^{n'-|y|-1}$, and gives it and $1^{n'}$ to $\A'$.
+      \item When $\A'$ outputs a value $x'=x_1\cdots x_{n'}$, get the first $n$ bits($x_1\cdots x_n=x$) and output $x$.  
+  \end{enumerate}
+  By the definition of $f'$, if $f'(x')=y\|10^{n'-|y|-1}$, then $f(x)=y$. Thus\[\Pr[\Invert_{\A,f}(n)=1]\ge\Pr[\Invert_{\A',f'}(n')=1]>\negl(n')\]
+  We have proved that $n'=\poly(n)$, thus $\A$ is \texttt{PPT} and 
+  \[\Pr[\Invert_{\A,f}(n)=1]>\negl(n).\]
+  That's a contradiction.\par
+  Thus $f'$ is one-way.
+\end{itemize}
+
+\end{problem}
+
+\begin{problem}{7.6} No.\par
+Let $f':\{0,1\}^{n-1}\rightarrow\{0,1\}^{n-1}$ be a length-preserving one-way function, construct $f:\{0,1\}^{n}\rightarrow\{0,1\}^{n}$:
+\[f(x)=f'(x_1\cdots x_{n-1})\|0,x=x_1\cdots x_n.\]
+First prove $f$ is a length-preserving one-way function. \par
+Obviously, it's length-preserving. Then $\forall$ algorithm $\A$ for $f$, construct an $\A'$ for $f'$:\begin{enumerate}
+    \item When $\A'$ is given $y$, construct $y\|0$ and give it to $\A$.
+    \item When $\A$ output $x_1\cdots x_n$, output $x=x_1\cdots x_{n-1}$
+\end{enumerate}
+If $\A$ can invert $f$ with non negligible probability, then \[\Pr[\Invert_{\A,f}(n)=1]>\negl(n).\] 
+And \begin{align*}
+    \Pr[\Invert_{\A',f'}(n-1)=1]=&\Pr[f'(x_1\cdots x_{n-1})=y]\\
+    =&\Pr[f(x_1\cdots x_{n})=y\|0]\\
+    =&\Pr[\Invert_{\A,f}(n)=1]
+\end{align*}
+Thus, \[\Pr[\Invert_{\A',f'}(n-1)=1]>\negl(n),\] a contradiction.
+So $f$ is a length-preserving one-way function.\par
+Use $G(x)=f(x)\|\hc(x)=f'(x_1\cdots x_{n-1})\|0\|\hc(x)$, here we have $x\in\{0,1\}^n$. And construct $D$, when the input is $s\in\{0,1\}^{n+1}$:
+\begin{enumerate}
+    \item if $s_n=0$, output $0$;
+    \item if $s_n=1$, output $1$.
+\end{enumerate}
+So $\Pr[D(G(x))=0]=1$. But if we uniformly draw $r\in\{0,1\}^{n+1}$, $\Pr[D(r)=0]=\frac12$. So it's not a pseudorandom generator.
+\end{problem}
+
+\begin{problem}{7.8}
+\textbf{Part1:} $g=f(f(x))$ \textbf{is not necessarily a one-way function.}\par
+By problem $7.3$, we have if there is a one-way function, there is also a length-preserving one-way function, denoted as $f$. \par
+Given $x=x_1,\cdots x_n$, we prove $f'(x)=f(x_1\cdots x_{n-1})$ is also a one-way function.(Specifically, if $n=1$, then $f'(x)=f(x)$.)\par Assume we have $\A'$ to invert $f'$, construct $\A$ to invert $f$:
+\begin{enumerate}
+    \item Given $y$ and $1^n$, $\A$ give $y,1^{n+1}$ to $\A'$.
+    \item When $\A'$ outputs $x'=x_1\cdots x_{n+1}$, output $x=x_1\cdots x_n$.
+\end{enumerate}
+So,
+\begin{align*}
+    \Pr[\Invert_{\A',f'}(n+1)=1]=&\Pr[f'(x_1\cdots x_{n}\|x_{n+1})=y]\\
+    =&\Pr[f(x_1\cdots x_{n})=y]\\
+    =&\Pr[\Invert_{\A,f}(n)=1]
+\end{align*}
+Since $f$ is a one-way function, $\Pr[\Invert_{\A,f}(n)=1]\le\negl(n)$.
+Thus, $\forall \A', \Pr[\Invert_{\A',f'}(n+1)=1]\le\negl(n)$, that is \[\Pr[\Invert_{\A',f'}(n)=1]\le\negl(n).\]
+So $f':\{0,1\}^n\rightarrow\{0,1\}^{n-1}(n>1)$ is also a one-way function.\par
+And if $f'(f'(x))$ is a one-way function, then $f'^{(2^t)}(x)$ is a one-way function. Note that $f'^{(2^t)}:\{0,1\}^n\rightarrow\{0,1\}^{n-2^t}$.\par
+Define $n=2^k+1$, then if we set $t=k$, given $x=x_1\cdots x_n$, $f'^{(2^t)}(x)=f'(x_1)=b,b\in\{0,1\}$. However, an algorithm $\A$ could compute $f(x_1)=b$ and get $x_1$ in constant time, then randomly choose $x_2\cdots x_n\in\{0,1\}^{n-1}$, and output $x_1\|x_2\cdots x_n$, which is a valid answer. That is $$\Pr[\Invert_{\A,f'^{(2^t)}}(n+1)=1]=1.$$\par
+So $g=f(f(x))$ is not necessarily a one-way function.\par\vspace{3ex}
+
+\textbf{Part2: $g'=f(x)\|f(f(x))$ is a one-way function.} \par
+If $g'$ is not, then \[\exists \A, \Pr[\Invert_{\A,g'}(n)=1]>\negl(n).\]\par
+Construct $A_f$ for $f$:
+\begin{enumerate}
+    \item Given $y$, compute $z=f(y)$, and give $y\|z$ to $\A$.
+    \item When $\A$ output $x$, output $x$.
+\end{enumerate}\par
+Then if $f(x)\|f(f(x))=y\|z$, then $f(x)=y$. So \[\Pr[\Invert_{\A_f,f}(n)=1]\ge\Pr[\Invert_{\A,g'}(n)=1]>\negl(n),\]
+a contradiction.\par
+Thus, $g'f=f(x)\|f(f(x))$ is also a one-way function. \par
+\end{problem}
+
+\begin{problem}{7.11}
+\textbf{(a)}.\par
+First, to invert a function of $\{0,1\}^n\rightarrow\{0,1\}^{p(n)}$ is in $NP$. That is, given $y(=f(x))$, we can guess a value for each $x_i,i=1,2,\cdots,n$, which can be done by a non deterministic turing machine.\par
+Second, if $one-way$ function exists, then there is no $PPT$ algorithm $\A$ which can invert it(except with negligible probability). Since a deterministic algorithm is also a $PPT$ algorithm. Thus there is no deterministic algorithm can invert it in polynomial time. So it's not in $P$.\par
+To sum up, $P\ne NP$.\par\vspace{3ex}
+\textbf{(b)}.\par
+Assume the parameter is $n$.\par
+If $P\ne NP$, we have a language $L$ and there is a non deterministic
+Turing Machine $M$ such that: If $l\in L$, $M$ accepts it in polynomial time (bounded by $t(n)$). But there is no deterministic Turing Machine which can do that.\par
+Since $M$ is non-determinism, it can take multiple paths and “branch” into multiple copies, each of which tries a different path. Define the path as $p\in\{0,1\}^{t(n)}$. Then we define,
+		\begin{equation*}  
+			f(w,p,flag)= \begin{cases}
+					(1,w), & M(p)=accept\land flag=0^n \\  
+					(0,w), & otherwise
+				\end{cases} 
+		\end{equation*}
+		Here $flag$ is uniformly drawn from $\{0,1\}^n$.\par
+(1).Since there are at most $t(n)$ steps along the path, $f(w,p)$ can be computed in polynomial time.\par
+(2).If $\exists\texttt{PPT}\A, s.t.\Pr[f(\A(f(x)))=f(x)]=1$, then we can replace the randomness by a type and get a deterministic algorithm $\A'$, such that $\A'(1,w)=(w,p)$. \par
+Construct $M'$. When the input is $w$, run $(1,w)$ on $\A'$ and get $(w,p)$. Then run $M$ following the path $p$. And $M'$ accept $w$ if and only if $M$ accepts. Thus $M'\in P$, a contradiction.\par
+So $f$ does not have a polynomial time
+computable right inverse and f is a hard to invert.\par
+(3).Just construct $\A$: \begin{itemize}
+    \item when $\A$ is given $(0,w)$, then randomly choose $p$, output $(w,p,1^n)$.
+    \item When $\A$ is given $(1,w)$, output an arbitrary value.
+\end{itemize} 
+So $\A$ can invert when $flag\ne 0^n$. Since $\Pr[flag=0^n]=2^{-n}$, thus
+\begin{align*}
+    &\Pr[f(\A(f(w,p,flag)))=f(w,p,flag)]\\
+    >&\Pr[f(\A(f(w,p,flag)))=f(w,p,flag)\land flag\ne0^n]\\
+    =&\Pr[flag\ne0^n]=1-2^{-n}.
+\end{align*}\par
+So $f$ is not one-way.\par
+And since $2^{-n}$ is negligible for $n$, so $f$ is not weakly one-way. \par
+\end{problem}
+
+\begin{problem}{7.16}
+Construct $D$ with oracle access to $\OO(\cdot)$(Given $(L_0,R_0)$, the oracle returns $(L_2,R_2)$):
+\begin{enumerate}
+    \item Run $1^n$. Randomly choose $L_0,R_0$ in $\{0,1\}^n$. 
+    \item Get $\OO(L_0,R_0))=(L_2,R_2)$. Then compute $L_0'=L_2\oplus L_0$.
+    \item Get $\OO(L_0',R_0)=(L_2',R_2')$. 
+    \item If $L_2'=0^n$, output $1$; otherwise, output $0$.
+\end{enumerate}
+If $\OO=\pi$ which is truly random, then $L_2'$ is a random string, thus \[\Pr[D^{\pi(\cdot)}(1^n)=1]=2^{-n}.\]
+If $\OO=\Feistel_{f_1,f_2}$, then 
+\begin{align*}
+    L_2'&=L_0'\oplus f_1(R_0)\\
+    &=L_2\oplus L_0\oplus f_1(R_0)\\
+    &=L_2\oplus L_2=0^n
+\end{align*}
+Thus \[\Pr[D^{\Feistel_{f_1,f_2}(\cdot)}(1^n)=1]=1.\]
+And 
+\[\Pr[D^{\Feistel_{f_1,f_2}(\cdot)}(1^n)=1]-\Pr[D^{\pi(\cdot)}(1^n)=1]=1-2^{-n}.\]
+So it's not a pseudorandom permutation.
+\end{problem}
+
+\begin{problem}{7.17}
+Construct $D$ with oracle access to $\OO(\cdot),\OO^{-1}(\cdot)$:
+\begin{enumerate}
+    \item Run $1^n$. Randomly choose $L_0,R_0$ in $\{0,1\}^n$. 
+    \item Get $\OO(L_0,R_0)=(L_3,R_3)$. 
+    \item Randomly choose $R_3'\ne R_3$ in $\{0,1\}^n$, ask $\OO^{-1}(L_3,R_3')=(L_0',R_0')$. 
+    \item Compute $L_0''=R_3\oplus R_3'\oplus L_0$, ask $\OO(L_0'',R_0)=(L_3'',R_3'')$.
+    \item If $L_3''=L_3\oplus R_0\oplus R_0'$, output $1$; otherwise, output $0$.
+\end{enumerate}
+If $\OO=\pi$ which is truly random, then $L_3''$ is a random string, thus \[\Pr[D^{\pi(\cdot),\pi^{-1}(\cdot)}(1^n)=1]=2^{-n}.\]
+If $\OO=\Feistel_{f_1,f_2,f_3}$, 
+\begin{enumerate}
+    \item After step 2, we have $L_3=R_0\oplus f_2(L_0\oplus f_1(R_0)),R_3=L_0\oplus f_1(R_0)\oplus f_3(L_3)$. 
+    \item After step 3, we have $L_3=R_0'\oplus f_2(L_0'\oplus f_1(R_0')),R_3'=L_0'\oplus f_1(R_0')\oplus f_3(L_3)$.
+    \item So $L_0''=R_3\oplus R_3'\oplus L_0=(L_0\oplus f_1(R_0)\oplus f_3(L_3))\oplus(L_0'\oplus f_1(R_0')\oplus f_3(L_3))\oplus L_0=L_0'\oplus f_1(R_0')\oplus f_1(R_0)$.
+    \item And in step 4, $L_3''=R_0\oplus f_2(L_0''\oplus f_1(R_0))=R_0\oplus f_2(L_0'\oplus f_1(R_0')\oplus f_1(R_0)\oplus f_1(R_0))=R_0\oplus f_2(L_0'\oplus f_1(R_0'))=R_0\oplus L_3\oplus R_0'$.
+\end{enumerate}
+Thus \[\Pr[D^{\Feistel_{f_1,f_2,f_3}(\cdot),\Feistel_{f_1,f_2,f_3}^{-1}(\cdot)}(1^n)=1]=1.\]
+And 
+\[\Pr[D^{\Feistel_{f_1,f_2,f_3}(\cdot),\Feistel_{f_1,f_2,f_3}^{-1}(\cdot)}(1^n)=1]-\Pr[D^{\pi(\cdot),\pi^{-1}(\cdot)}(1^n)=1]=1-2^{-n}.\]
+So it's not a strong pseudorandom permutation.
+\end{problem}
+
+\begin{problem}{7.19}
+Let $\A$ be an arbitrary probabilistic polynomial-time algorithm. We show that $\Pr[\Invert_{\A,G}(n)=1]$ is negligible.\par
+To see this, consider the following \texttt{PPT} distinguisher $D$: on input a string $w\in\{0,1\}^{n+1}$, run $\A(w)$ to obtain output $s$. If $G(s)=w$ then output $1$; otherwise, output $0$.\par
+Denote $W_0=\{w\mid \exists s\in\{0,1\}^n, s.t.G(s)=w\}$. \par
+If $w$ is chosen by $G(s)$, then
+\begin{align*}
+    \Pr[D(G(s))=1]=&\Pr[\Invert_{\A,G}(n)=1]\\
+    =&\sum_{w\in W_0}\Pr[G(\A(w))=w\mid W=w]\Pr[W=w]\\
+    \ge&2^{-n}\sum_{w\in W_0}\Pr[G(\A(w))=w\mid W=w]
+\end{align*}
+The last inequality holds because if $w\in W_0$, there exists at least one $s$, such that $G(s)=w$. So $\Pr[W=w]\ge \Pr[S=s]=2^{-n}$.\par
+If $w$ is uniformly chosen from $\{0,1\}^{n+1}$, then 
+\begin{align*}
+    \Pr[D(w)=1]=&\sum_{w\in W_0}\Pr[G(\A(w))=w\mid W=w]\Pr[W=w]\\
+    =&2^{-(n+1)}\sum_{w\in W_0}\Pr[G(\A(w))=w\mid W=w]
+\end{align*}\par
+Let's denote $r$ as a uniform string, so
+\[\Pr[D(G(s))=1]\ge2\times 2^{-(n+1)}\sum_{w\in W_0}\Pr[G(\A(w))=w\mid W=w]= 2\times\Pr[D(r)=1]. \]
+If $\Pr[\Invert_{\A,G}(n)=1]>\frac{1}{p(n)}$, where $p(n)\in\poly(n)$, then \[\Pr[D(G(s))=1]-\Pr[D(r)=1]\ge\frac12\Pr[D(G(s))=1]=\frac12\Pr[\Invert_{\A,G}(n)=1]>\frac{1}{2p(n)},\] which means $G$ is not a pseudorandom generator, a contradiction.\par
+Thus, $G$ is a one-way function.
+\end{problem}
+
+\begin{problem}{7.20}
+For arbitrary $D\in\texttt{PPT}$, since $\mathcal{X}\overset{c}{\equiv}\mathcal{Y}$, we have 
+\[\left|\Pr_{x\leftarrow X_n}[D(1^n,x)=1]-\Pr_{y\leftarrow Y_n}[D(1^n,y)=1]\right|\le\negl(n).\]
+Similarly, \[\left|\Pr_{y\leftarrow Y_n}[D(1^n,y)=1]-\Pr_{z\leftarrow Z_n}[D(1^n,z)=1]\right|\le\negl(n).\]
+To sum up, \[\left|\Pr_{x\leftarrow X_n}[D(1^n,x)=1]-\Pr_{z\leftarrow Z_n}[D(1^n,z)=1]\right|\le\negl(n).\]
+So $\mathcal{X}\overset{c}{\equiv}\mathcal{Z}$.
+\end{problem}
+
+\begin{problem}{7.22}
+For any $D\in\texttt{PPT}$ for $\{\A(X_n)\}_{n\in N}$ and $\{\A(Y_n)\}_{n\in N}$, construct $D'$:
+\begin{enumerate}
+    \item When given $x,y$, compute $\A(x),\A(y)$, and give them and $1^n$ to $D$.
+    \item Output the same as what $D$ outputs.
+\end{enumerate}
+Thus \[ \Pr_{x\leftarrow X_n}[D(1^n,x)=1]=\Pr_{\A(x)\leftarrow \A(X_n)}[D(1^n,\A(x))=1] \]\[ \Pr_{y\leftarrow Y_n}[D(1^n,y)=1]=\Pr_{\A(y)\leftarrow \A(Y_n)}[D(1^n,\A(y))=1] \]
+Since $\mathcal{X}\overset{c}{\equiv}\mathcal{Z}$, we have \[\left|\Pr_{x\leftarrow X_n}[D(1^n,x)=1]-\Pr_{y\leftarrow Y_n}[D(1^n,y)=1]\right|\le\negl(n).\] So \[\left|\Pr_{\A(x)\leftarrow \A(X_n)}[D(1^n,\A(x))=1]-\Pr_{\A(y)\leftarrow \A(Y_n)}[D(1^n,\A(y))=1]\right|\le\negl(n).\]
+That is $\{\A(X_n)\}_{n\in N}\overset{c}{\equiv}\{\A(Y_n)\}_{n\in N}$
+\end{problem}
+
+\end{document}
+

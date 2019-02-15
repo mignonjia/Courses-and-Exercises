@@ -1,0 +1,136 @@
+\documentclass[a4paper]{article}
+ \usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{graphicx} 
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+
+\newcommand{\poly}{\text{poly}}
+\newcommand{\negl}{\text{negl}}
+\newcommand{\Enc}{\text{Enc}}
+\newcommand{\Dec}{\text{Dec}}
+\newcommand{\Gen}{\text{Gen}}
+\newcommand{\Mac}{\text{Mac}}
+\newcommand{\Vrfy}{\text{Vrfy}}
+\newcommand{\Func}{\text{Func}}
+\newcommand{\Perm}{\text{Perm}}
+\newcommand{\Getvrfy}{\text{Get-Vrfy}}
+\newcommand{\hash}{\text{Hash}}
+\newcommand{\hashsec}{\text{Hash-sec}}
+\newcommand{\Feistel}{\text{Feistel}}
+\newcommand{\Ext}{\text{Ext}}
+\newcommand{\Invert}{\text{Invert}}
+\newcommand{\hc}{\text{hc}}
+\newcommand{\myn}{l_{in}(n)}
+\newcommand{\G}{\mathbb{G}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\U}{\mathcal{U}}
+\newcommand{\Y}{\mathcal{Y}}
+\newcommand{\K}{\mathcal{K}}
+\newcommand{\Z}{\mathcal{Z}}
+\newcommand{\h}{\mathbb{H}}
+\newcommand{\V}{\mathcal{V}}
+\newcommand{\A}{\mathcal{A}}
+\newcommand{\OO}{\mathcal{O}}
+
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+%If you want to title your bold things something different just make another thing exactly like this but replace "problem" with the name of the thing you want, like theorem or lemma or whatever
+ 
+\begin{document}
+ 
+%\renewcommand{\qedsymbol}{\filledbox}
+%Good resources for looking up how to do stuff:
+%Binary operators: http://www.access2science.com/latex/Binary.html
+%General help: http://en.wikibooks.org/wiki/LaTeX/Mathematics
+%Or just google stuff
+ 
+\title{Chapter 08}
+\author{Mingjia Huo}
+\date{}
+\maketitle
+
+\begin{problem}{8.1}
+By the definition of group, we have $\G$ has a identity and every element in $\G$ has a inverse.\par
+\textbf{Unique identity}:\\
+Given two identities $a,b\in\G$, we have $ab=a$ and $ab=b$. So $a=b$, and there is only one identity. \par
+\textbf{Unique inverse}:\\
+For element $a\in\G$, given it's inverse $b,c$, we have $ba=ab=e, ca=ac=e$. So $b=be=b(ac)=(ba)c=ec=c$, thus there is only one inverse of $a$.
+\end{problem}
+
+\begin{problem}{8.3}$ $\par
+$\G$ is finite:
+\begin{itemize}
+    \item Closure: Since $g\in\G$, with the closure property, $\forall i\in\mathbb{N},g^i\in\G$. So we have $\langle g\rangle\subseteq\G$, a close-set.
+    \item Existence of an identity: $g^0=e$. $\forall a\in\langle g\rangle$, we have $a\in\G$. So $ae=ea=a$.
+    \item Existence of inverses: Since $\langle g\rangle\subseteq\G$, $\exists i,j\in\mathbb{N},i<j, g^i=g^j$. There is a inverse of $g^i$ in $\G$, denoted as $a$. So $e=ag^i=ag^j=ag^ig^{j-i}=g^{j-i}$. Let $t=j-i$. Thus $\forall s\in\mathbb{N}, s=kt+r,0\le r<t$, so $g^s=g^r$.\begin{itemize}
+        \item If $r=0$, it's inverse is $e$.
+        \item If $r>0$, it's inverse is $g^{t-r}$.
+    \end{itemize} So we get the inverse of $g^s$.
+    \item Associativity: $\forall a,b,c\in\langle g\rangle$, we have $a,b,c\in\G$, which has associativity. Thus $\langle g\rangle$ has associativity.
+\end{itemize}\par\vspace{1ex}
+$\G$ is infinite: give a counterexample:\par
+Give $g=1,\G=(\Z,+)$. Then $\langle g\rangle=\{0,1,2\cdots\}$. But $\{1,2\cdots\}$ don't have their inverses, a contradiction.
+
+\end{problem}
+
+\begin{problem}{8.8} 
+Define $\G\times\h=\{(g,h)\mid g\in\G,h\in\h\}$, and the operation is $(a,b)(c,d)=(ab,cd)$.
+\begin{itemize}
+    \item Closure: 
+    $\forall (a,b),(c,d)\in \G\times \h$, we have $(ac,bd)$ with $ac\in\G,bd\in\h$. 
+    Thus $(ac,bd)\in \G\times \h$.
+    \item Existence of an identity: 
+    The identities of $\G,\h$ are $e_g,e_h$ respectively, so $\forall (a,b)\in \G\times \h$, $(a,b)(e_g,e_h)=(ae_g,be_h)=(a,b)$. 
+    And it's similar with $(e_g,e_h)(a,b)$. So the identity is $(e_g,e_h)$.
+    \item Existence of inverses: 
+    $\forall (a,b)\in \G\times \h$, denote $a^{-1}\in\G,b^{-1}\in\h$. 
+    So $(a,b)(a^{-1},b^{-1})=(aa^{-1},bb^{-1})=(e_g,e_h)$, which is the identity of $\G\times\h$. 
+    And it's similar with $(a^{-1},b^{-1})(a,b)$. So the inverse is $(a^{-1},b^{-1})$.
+    \item Associativity: $((a_1,b_1)(a_2,b_2))(a_3,b_3)=((a_1a_2)a_3,(b_1b_2)b_3)=(a_1(a_2a_3),b_1(b_2b_3))=(a_1,b_1)((a_2,b_2)(a_3,b_3)).$
+    The second equality holds for the associativity of $\G,\h$.
+    \end{itemize}
+\end{problem}
+
+\begin{problem}{8.14}
+Construct $\A'$ as followed:
+\begin{enumerate}
+    \item $\A'$ is given $y$. Set $cnt=1$.
+    \item Uniformly choose $r\in\Z_N^*$. It's easy compute $r^{-1}$ in $\log N$ time by Euclidean algorithm. 
+    \item Compute $yr^e=y'\mod N$, and give $y'$ to $\A$.
+    \item When $\A$ outputs $x'$, check if $x'^e=y'$.
+        \begin{itemize}
+            \item If so, output $x=x'r^{-1}$.
+            \item If not, then check the number of $cnt$. If $cnt<500$, increase $cnt$ by 1 and jump to step 2; else return a uniform $x\in\Z_N^*$.
+        \end{itemize}
+\end{enumerate}
+In the above algorithm, $\A'$ can uniformly choose at most $99$ $r$. Since $r$ is uniform, then $xr$ is uniform in $\Z_N^*$. Since 
+$$\Pr[\A([(xr)^e\mod N])=xr]=0.01,$$
+we have $\Pr[\A([(xr)^e\mod N])\ne xr]=0.99$. Repeat 500 times, the probability of all failed is $$\Pr[\A([(xr)^e\mod N])\ne xr]^{500}\approx 0.006<0.01.$$ And $$\Pr[\A'([(x)^e\mod N])=x]=1-\Pr[\A([(xr)^e\mod N])=xr]^{500}>0.99.$$
+\end{problem}
+
+\begin{problem}{8.16}
+Determine the points on the elliptic curve E : $y^2=x^3+2x+1$ over $\Z_{11}$. How many points are on this curve?
+
+Firstly, the quadratic residues of $11$ are $1,4,9,5,3$.\par
+Define $f(x)=x^3+2x+1$, 
+\begin{itemize}
+    \item $f(0)=1.$ So $(0,1),(0,-1)$ is on the curve.
+    \item $f(1)=4$. So $(1,2),(1,-2)$ is on the curve.
+    \item $f(2)=2$, a quadratic non-residue modulo $11$.
+    \item $f(3)=1$. So $(3,1),(3,-1)$ is on the curve.
+    \item $f(4)=7$, a quadratic non-residue modulo $11$.
+    \item $f(5)=4$. So $(5,2),(5,-2)$ is on the curve.
+    \item $f(6)=9$. So $(9,3),(9,-3)$ is on the curve.
+    \item $f(7)=6$, a quadratic non-residue modulo $11$.
+    \item $f(8)=1$. So $(8,1),(8,-1)$ is on the curve.
+    \item $f(9)=0$. So $(9,0)$ is on the curve.
+    \item $f(10)=9$. So $(10,3),(10,-3)$ is on the curve.
+\end{itemize}
+Along with $\{\mathcal{O}\}$, there are totally $16$ points on $y^2=x^3+2x+1$ over $\Z_{11}$. 
+\end{problem}
+
+
+\end{document}
+
