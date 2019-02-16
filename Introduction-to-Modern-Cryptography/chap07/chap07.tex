@@ -96,7 +96,9 @@ Finally, define $f':\{0,1\}^*\rightarrow\{0,1\}^*$ as followed:
 
 \end{problem}
 
-\begin{problem}{7.6} No.\par
+\begin{problem}{7.6} 
+$ $\par
+No.\par
 Let $f':\{0,1\}^{n-1}\rightarrow\{0,1\}^{n-1}$ be a length-preserving one-way function, construct $f:\{0,1\}^{n}\rightarrow\{0,1\}^{n}$:
 \[f(x)=f'(x_1\cdots x_{n-1})\|0,x=x_1\cdots x_n.\]
 First prove $f$ is a length-preserving one-way function. \par
@@ -273,6 +275,5 @@ Thus \[ \Pr_{x\leftarrow X_n}[D(1^n,x)=1]=\Pr_{\A(x)\leftarrow \A(X_n)}[D(1^n,\A
 Since $\mathcal{X}\overset{c}{\equiv}\mathcal{Z}$, we have \[\left|\Pr_{x\leftarrow X_n}[D(1^n,x)=1]-\Pr_{y\leftarrow Y_n}[D(1^n,y)=1]\right|\le\negl(n).\] So \[\left|\Pr_{\A(x)\leftarrow \A(X_n)}[D(1^n,\A(x))=1]-\Pr_{\A(y)\leftarrow \A(Y_n)}[D(1^n,\A(y))=1]\right|\le\negl(n).\]
 That is $\{\A(X_n)\}_{n\in N}\overset{c}{\equiv}\{\A(Y_n)\}_{n\in N}$
 \end{problem}
-
 \end{document}
 
